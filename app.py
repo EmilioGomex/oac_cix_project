@@ -34,12 +34,12 @@ INDICADORES_A_EVALUAR = [
     'Factores de emisión',
     'Alcance 1',
     'Alcance 2',
-    'Alcance 3',
-    'Categorías excluidas',
-    'Consolidación',
-    'Auditoría',
-    'Compromisos de reducción',
-    'Evaluación de incertidumbre'
+    'Alcance 3. Adquisición de bienes y servicios',
+    'Alcance 3. Adquisición de bienes y servicios',
+    'Alcance 3. Residuos',
+    'Alcance 3. Otras actividades aguas abajo',
+    'Alcance 3. Movilidad usuarios y empleados',
+    'Evaluación de la incertidumbre'
 ]
 
 SUPABASE_BUCKET_NAME = "evaluaciones-cix-files" # Asegúrate de que este nombre coincida con tu bucket en Supabase
@@ -67,9 +67,9 @@ def procesar_evaluacion_empresa(file_bytes_obj, file_name):
         # Basado en la plantilla de evaluación que proporcionaste
         # Usamos .iloc para acceder a celdas específicas por su índice (fila, columna)
         # y pd.isna para manejar celdas vacías
-        nombre_organizacion = df_raw.iloc[5, 1] if not pd.isna(df_raw.iloc[5, 1]) else file_name.split('-')[0].replace(".xlsx", "").replace(".csv", "")
-        periodo_informe = df_raw.iloc[6, 1] if not pd.isna(df_raw.iloc[6, 1]) else "Desconocido"
-        enlace_documentacion = df_raw.iloc[7, 1] if not pd.isna(df_raw.iloc[7, 1]) else "N/A"
+        nombre_organizacion = df_raw.iloc[5, 2] if not pd.isna(df_raw.iloc[5, 2]) else file_name.split('-')[0].replace(".xlsx", "").replace(".csv", "")
+        periodo_informe = df_raw.iloc[6, 2] if not pd.isna(df_raw.iloc[6, 2]) else "Desconocido"
+        enlace_documentacion = df_raw.iloc[7, 2] if not pd.isna(df_raw.iloc[7, 2]) else "N/A"
 
         # --- Extracción de Calificaciones de Indicadores ---
         puntuaciones_indicadores = {}
@@ -121,7 +121,6 @@ def procesar_evaluacion_empresa(file_bytes_obj, file_name):
 
 # --- 3. Funciones de Interacción con Supabase ---
 
-def subir_archivo_a_supabase(uploaded_file):
     """Sube un archivo a Supabase Storage y retorna su URL pública."""
     try:
         if uploaded_file.name is None:
@@ -147,7 +146,31 @@ def subir_archivo_a_supabase(uploaded_file):
     except Exception as e:
         st.error(f"Excepción al subir archivo a Supabase Storage: {e}")
         return None
+def subir_archivo_a_supabase(uploaded_file):
+    """Sube un archivo a Supabase Storage y retorna su URL pública."""
+    try:
+        if uploaded_file.name is None:
+            st.error("No se detectó un nombre de archivo para subir.")
+            return None
 
+        file_name = uploaded_file.name
+        file_bytes = uploaded_file.getvalue() # Obtiene los bytes del archivo subido
+
+        # La llamada a 'upload' en sí misma. Si falla, debería lanzar una excepción.
+        supabase.storage.from_(SUPABASE_BUCKET_NAME).upload(file_name, file_bytes, {"ContentType": uploaded_file.type})
+
+        # Si llegamos a este punto, la llamada a 'upload' no lanzó una excepción,
+        # lo que significa que la subida fue exitosa.
+        public_url = f"{SUPABASE_URL}/storage/v1/object/public/{SUPABASE_BUCKET_NAME}/{file_name}"
+        st.success(f"Archivo '{file_name}' subido a Supabase Storage.")
+        return public_url
+
+    except Exception as e:
+        # Esto capturará cualquier excepción que la librería de Supabase lance
+        # (por ejemplo, por problemas de permisos, nombres de archivo inválidos, etc.)
+        st.error(f"Excepción al subir archivo a Supabase Storage: {e}")
+        return None
+    
 def guardar_evaluacion_en_db(eval_data, file_url_supabase):
     """Guarda los datos de la evaluación en la tabla 'evaluaciones' de Supabase."""
     try:
@@ -234,10 +257,10 @@ def visualizar_resultados_streamlit(df_data):
     st.subheader("📋 Tabla de Resultados Detallada")
     # Selecciona las columnas clave para mostrar en la tabla principal
     columnas_a_mostrar = [
-        'organizacion_nombre', 'periodo_informe', 'cix_total',
-        'datos_actividad', 'factores_emision', 'alcance_1', 'alcance_2',
-        'alcance_3', 'categorias_excluidas', 'consolidacion', 'auditoria',
-        'compromisos_de_reduccion', 'evaluacion_de_incertidumbre',
+        'organizacion_nombre', 'periodo_informe', 'enlace_original_documentacion','cix_total',
+        'datos_de_actividad', 'factores_de_emisión', 'alcance_1', 'alcance_2',
+        'alcance_3._adquisición_de_bienes_y_servicios', 'alcance_3._residuos', 'alcance_3._otras_actividades_aguas_abajo', 'alcance_3._movilidad_usuarios_y_empleados',
+        'evaluación_de_la_incertidumbre',
         'fecha_evaluacion', 'url_archivo_supabase'
     ]
     # Muestra el DataFrame en Streamlit
