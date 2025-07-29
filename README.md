@@ -50,4 +50,4 @@ Sigue las instrucciones en la interfaz para subir, visualizar y gestionar evalua
 ## Autor
 Desarrollado para el **Observatorio de Acción Climática (OAC)** - Proyecto Segundo Parcial
 
-Ingeniería Mecatrónica - ESPOL
+Emilio Gómez - Ingeniería Mecatrónica - ESPOL
