@@ -24,7 +24,7 @@ Instala las dependencias con:
 pip install -r requirements.txt
 ```
 
-## Configuración
+## Configuración para un nuevo proyecto
 1. Crea un archivo `.streamlit/secrets.toml` con tus credenciales de Supabase:
 
 ```
