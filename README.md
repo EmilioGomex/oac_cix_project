@@ -34,8 +34,12 @@ SUPABASE_KEY = "<tu_supabase_key>"
 
 2. Asegúrate de tener un bucket en Supabase Storage llamado `evaluaciones-cix-files` y una tabla `evaluaciones` con las columnas necesarias.
 
+
 ## Uso
-Ejecuta la aplicación con:
+
+Puedes probar la aplicación desplegada aquí: [https://oac-cix-project.streamlit.app/](https://oac-cix-project.streamlit.app/)
+
+O ejecuta la aplicación localmente con:
 
 ```
 streamlit run app.py
