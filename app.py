@@ -385,4 +385,4 @@ elif menu_selection == "Ver Evaluaciones Guardadas":
 
 st.markdown("---")
 st.markdown("Desarrollado para el **Observatorio de Acción Climática (OAC)** - Proyecto Segundo Parcial")
-st.caption("Ingeniería Mecatrónica")
+st.caption("Ingeniería Mecatrónica - ESPOL")
